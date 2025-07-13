@@ -99,6 +99,12 @@ class Person(models.Model):
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)  # Проверка пароля
 
+    class Meta:
+        ordering = ['-fio']
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+       # db_table = 'db_person'
+
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=False)
@@ -108,10 +114,11 @@ class Order(models.Model):
         decimal_places=2,
         null=False,
         blank=True,
+        default=0.00,
         verbose_name='Итого'
     )
     status = models.CharField(
-        choices=[("в обработке", "в обработке"),("доставляется","доставляется"), ("доставлено","доставлено")],
+        choices=[("в обработке", "в обработке"), ("доставляется", "доставляется"), ("доставлено", "доставлено")],
         default="в обработке")
 
     def save(self, *args, **kwargs):
@@ -123,7 +130,7 @@ class Order(models.Model):
         super().save(update_fields=['total'])
 
     def __str__(self):
-        return f"Заказ {self.owner.name} - {self.total} руб."
+        return f"Заказ {self.owner.fio} - {self.total} руб."
 
     class Meta:
         ordering = ['-created_at']
