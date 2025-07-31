@@ -123,9 +123,9 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Сначала сохраняем заказ
-        self._calculate_total()        # Затем пересчитываем сумму
+        self._total_price()        # Затем пересчитываем сумму
 
-    def _calculate_total(self):
+    def _total_price(self):
         self.total = sum(item.item_price for item in self.items.all())
         super().save(update_fields=['total'])
 
@@ -157,27 +157,21 @@ class OrderItem(models.Model):
         db_table = 'db_order_item'
 
 
-class Feedback(models.Model):
+class Review(models.Model):
     item = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="feedbacks")
+    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="reviews")
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     Rating = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         help_text="Оценка от 1 до 5",
         default=5)
-    feedback = models.TextField()
+    review = models.TextField()
 
     def __str__(self):
-        return f"{self.feedback} "
+        return f"{self.review} "
 
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        db_table = 'db_feedback'
-
-
-
-
-
-
+        db_table = 'db_review'
 
